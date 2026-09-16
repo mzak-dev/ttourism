@@ -2,59 +2,89 @@
 
 A tour planner — build a trip as an ordered itinerary of places, days and travel legs.
 
-> **Status: pre-alpha.** The repository is configured but the application has not been
-> scaffolded yet. See [Getting started](#getting-started).
+> **Status: early.** The application is scaffolded and builds, but no tour-planning
+> features exist yet — what you get today is the stock React Router starter route.
 
-## Planned stack
+## Stack
 
-| Concern    | Choice                                   |
-| ---------- | ---------------------------------------- |
-| Framework  | [React Router](https://reactrouter.com) (framework mode) |
-| UI         | [shadcn/ui](https://ui.shadcn.com) — `rhea` style, olive base, teal theme |
-| Styling    | Tailwind CSS, CSS variables for theming  |
-| Icons      | [lucide](https://lucide.dev)             |
-| Language   | TypeScript                               |
-| Package manager | pnpm                                |
+| Concern         | Choice                                                            |
+| --------------- | ----------------------------------------------------------------- |
+| Framework       | [React Router](https://reactrouter.com) 7 (framework mode, SSR on) |
+| UI              | [shadcn/ui](https://ui.shadcn.com) — `base-rhea` style on [Base UI](https://base-ui.com) |
+| Theme           | olive base colour, CSS variables, `subtle` menu accent            |
+| Styling         | Tailwind CSS 4 (via `@tailwindcss/vite`)                          |
+| Icons           | [lucide](https://lucide.dev)                                      |
+| Font            | Inter (`@fontsource-variable/inter`)                              |
+| Language        | TypeScript, React 19                                              |
+| Build           | Vite                                                              |
+| Package manager | pnpm                                                              |
 
 ## Getting started
 
-Scaffold the application into this repository:
-
-```bash
-pnpm dlx shadcn@latest init --preset b2DdygS7E --template react-router --name ttourism
-```
-
-Then:
-
 ```bash
 pnpm install
-pnpm dev      # start the dev server
-pnpm build    # production build
+pnpm dev        # dev server at http://localhost:5173
 ```
 
-Add shadcn components as you need them:
+Other scripts:
 
 ```bash
-pnpm dlx shadcn@latest add button card calendar
+pnpm typecheck  # react-router typegen && tsc
+pnpm build      # production build into build/
+pnpm start      # serve the production build
+pnpm format     # prettier --write
 ```
+
+## Adding UI components
+
+```bash
+pnpm dlx shadcn@latest add card calendar dialog
+```
+
+Components land in `app/components/ui/` and are imported through the `~` alias:
+
+```tsx
+import { Button } from "~/components/ui/button"
+```
+
+The style, base colour and icon library are pinned in `components.json`; changing
+them there keeps future `add` commands consistent with what is already generated.
 
 ## Repository layout
 
 ```
 .
-├── CLAUDE.md              # project brief + agent skill configuration
+├── app/
+│   ├── components/ui/     # shadcn components
+│   ├── lib/utils.ts       # cn() helper
+│   ├── routes/            # route modules
+│   ├── routes.ts          # route config
+│   ├── root.tsx           # document shell
+│   └── app.css            # Tailwind + theme variables
+├── public/
 ├── docs/
 │   ├── adr/               # architecture decision records
 │   └── agents/            # how coding agents should work in this repo
-│       ├── issue-tracker.md
-│       ├── triage-labels.md
-│       └── domain.md
+├── components.json        # shadcn config
+├── react-router.config.ts
+├── vite.config.ts
+├── Dockerfile
+├── CLAUDE.md              # project brief + agent skill configuration
 ├── CONTRIBUTING.md
 └── LICENSE
 ```
 
 `CONTEXT.md` (the domain glossary) is created lazily, once there is real domain
 language worth pinning down.
+
+## Deployment
+
+The generated `Dockerfile` builds and serves the app with `react-router-serve`:
+
+```bash
+docker build -t ttourism .
+docker run -p 3000:3000 ttourism
+```
 
 ## Working with agents
 

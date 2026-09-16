@@ -4,6 +4,7 @@
 
 - Node.js 22+
 - pnpm 10+ (`corepack enable pnpm`)
+- Docker, only if you want to test the production image
 
 ## Setup
 
@@ -26,11 +27,12 @@ pnpm dev
 ## Before opening a pull request
 
 ```bash
+pnpm typecheck
+pnpm format
 pnpm build
 ```
 
-Once the app is scaffolded this will also run typechecking; add lint and test
-commands here as they land.
+Add test and lint commands here as they land.
 
 ## Architecture decisions
 
