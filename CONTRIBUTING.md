@@ -4,7 +4,7 @@
 
 - Node.js 22+
 - pnpm 10+ (`corepack enable pnpm`)
-- Docker, only if you want to test the production image
+
 
 ## Setup
 
@@ -33,6 +33,16 @@ pnpm build
 ```
 
 Add test and lint commands here as they land.
+
+CI runs `pnpm typecheck` and `pnpm build:pages` on every push to `main`, so a
+failure in either blocks the deploy.
+
+## Deployment
+
+`main` deploys itself to https://mzak-dev.github.io/ttourism/ on every push.
+There is no server in production — see
+[ADR 0001](docs/adr/0001-static-spa-on-github-pages.md) before reaching for a
+server `loader` or `action`.
 
 ## Architecture decisions
 

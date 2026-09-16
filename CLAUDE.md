@@ -4,16 +4,18 @@ A tour planner. Plan a trip as an ordered itinerary of places, days and travel l
 
 ## Stack
 
-React Router 7 (framework mode, SSR on) · React 19 · TypeScript · Tailwind CSS 4 ·
-shadcn/ui (`base-rhea` style on Base UI, olive base colour, lucide icons) · Vite · pnpm.
+React Router 7 (framework mode, **SPA — `ssr: false`**) · React 19 · TypeScript ·
+Tailwind CSS 4 · shadcn/ui (`base-rhea` style on Base UI, olive base colour, lucide
+icons) · Vite · pnpm. Deployed as static files to GitHub Pages under `/ttourism/`.
 
 ## Commands
 
 ```bash
-pnpm dev        # dev server
-pnpm typecheck  # react-router typegen && tsc — run this before committing
-pnpm build      # production build
-pnpm format     # prettier --write
+pnpm dev         # dev server, at http://localhost:5173/ttourism/
+pnpm typecheck   # react-router typegen && tsc — run this before committing
+pnpm build       # production build
+pnpm build:pages # production build + the GitHub Pages fallback files
+pnpm format      # prettier --write
 ```
 
 ## Conventions
@@ -28,6 +30,14 @@ pnpm format     # prettier --write
 - Prettier is configured without semicolons (`.prettierrc`). Run `pnpm format`
   rather than reformatting by hand.
 - Route modules live in `app/routes/` and must be registered in `app/routes.ts`.
+- **There is no server.** Never write a server `loader` or `action` — the build
+  has `ssr: false` and they will not run. Use `clientLoader` and `clientAction`.
+  Anything needing a secret needs a backend this project does not have; say so
+  rather than inventing one. See `docs/adr/0001-static-spa-on-github-pages.md`.
+- The app is served from `/ttourism/`, not the domain root. That path is set in
+  both `vite.config.ts` (`base`) and `react-router.config.ts` (`basename`) —
+  change one and you must change the other. Never hardcode a root-absolute URL
+  like `/favicon.ico`; it will 404 in production.
 
 ## Agent skills
 

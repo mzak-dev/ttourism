@@ -9,7 +9,7 @@ A tour planner — build a trip as an ordered itinerary of places, days and trav
 
 | Concern         | Choice                                                            |
 | --------------- | ----------------------------------------------------------------- |
-| Framework       | [React Router](https://reactrouter.com) 7 (framework mode, SSR on) |
+| Framework       | [React Router](https://reactrouter.com) 7 (framework mode, SPA — no SSR) |
 | UI              | [shadcn/ui](https://ui.shadcn.com) — `base-rhea` style on [Base UI](https://base-ui.com) |
 | Theme           | olive base colour, CSS variables, `subtle` menu accent            |
 | Styling         | Tailwind CSS 4 (via `@tailwindcss/vite`)                          |
@@ -23,16 +23,20 @@ A tour planner — build a trip as an ordered itinerary of places, days and trav
 
 ```bash
 pnpm install
-pnpm dev        # dev server at http://localhost:5173
+pnpm dev        # dev server at http://localhost:5173/ttourism/
 ```
+
+The `/ttourism/` path is not a quirk of dev — the site is served from that path
+in production too (see [Deployment](#deployment)), and dev matches it so URLs
+behave the same in both.
 
 Other scripts:
 
 ```bash
-pnpm typecheck  # react-router typegen && tsc
-pnpm build      # production build into build/
-pnpm start      # serve the production build
-pnpm format     # prettier --write
+pnpm typecheck   # react-router typegen && tsc
+pnpm build       # production build into build/client/
+pnpm build:pages # same, plus the 404.html fallback and .nojekyll that Pages needs
+pnpm format      # prettier --write
 ```
 
 ## Adding UI components
@@ -65,10 +69,11 @@ them there keeps future `add` commands consistent with what is already generated
 ├── docs/
 │   ├── adr/               # architecture decision records
 │   └── agents/            # how coding agents should work in this repo
+├── .github/workflows/     # CI — builds and deploys to GitHub Pages
+├── scripts/               # build helpers
 ├── components.json        # shadcn config
 ├── react-router.config.ts
 ├── vite.config.ts
-├── Dockerfile
 ├── CLAUDE.md              # project brief + agent skill configuration
 ├── CONTRIBUTING.md
 └── LICENSE
@@ -79,12 +84,24 @@ language worth pinning down.
 
 ## Deployment
 
-The generated `Dockerfile` builds and serves the app with `react-router-serve`:
+Every push to `main` builds and publishes to GitHub Pages via
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml). The
+live site is **https://mzak-dev.github.io/ttourism/**. You can also trigger a
+deploy by hand from the Actions tab.
 
-```bash
-docker build -t ttourism .
-docker run -p 3000:3000 ttourism
-```
+This requires **Settings → Pages → Source = GitHub Actions** on the repository;
+with the default "Deploy from a branch" the workflow fails at the deploy step.
+
+Because Pages is a static host, the app renders entirely in the browser
+(`ssr: false`) — so **server `loader` and `action` functions are unavailable**;
+use `clientLoader`/`clientAction`. The reasoning, and what it would take to
+reverse it, is in
+[ADR 0001](docs/adr/0001-static-spa-on-github-pages.md).
+
+Two details make a single-page app work on Pages, both handled by
+`pnpm build:pages`: `index.html` is copied to `404.html` so deep links reach the
+router instead of Pages' own 404, and an empty `.nojekyll` stops Jekyll
+discarding Vite's underscore-prefixed asset directories.
 
 ## Working with agents
 
